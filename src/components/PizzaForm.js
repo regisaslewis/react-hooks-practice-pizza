@@ -1,8 +1,37 @@
 import React from "react";
 
-function PizzaForm() {
+function PizzaForm({
+  editId,
+  editTopping,
+  editSize,
+  editVegetarian,
+  updateTopping,
+  updateSize,
+  updateVegetarian,
+  handleSubmit
+   }) {
+
+    function onHandleSubmit(e) {
+      e.preventDefault();
+      fetch(`http://localhost:3001/pizzas/${editId}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          topping: editTopping,
+          size: editSize,
+          vegetarian: editVegetarian
+        })
+      })
+      .then(resp => resp.json())
+      .then(data => {
+        handleSubmit(data);
+      })
+    }
+
   return (
-    <form onSubmit={null /*handle that submit*/}>
+    <form onSubmit={onHandleSubmit}>
       <div className="form-row">
         <div className="col-5">
           <input
@@ -10,10 +39,12 @@ function PizzaForm() {
             type="text"
             name="topping"
             placeholder="Pizza Topping"
+            value={editTopping}
+            onChange={e => updateTopping(e.target.value)}
           />
         </div>
         <div className="col">
-          <select className="form-control" name="size">
+          <select value={editSize} onChange={e => updateSize(e.target.value)} className="form-control" name="size">
             <option value="Small">Small</option>
             <option value="Medium">Medium</option>
             <option value="Large">Large</option>
@@ -26,6 +57,8 @@ function PizzaForm() {
               type="radio"
               name="vegetarian"
               value="Vegetarian"
+              checked={editVegetarian}
+              onChange={e => updateVegetarian(e.target.checked)}
             />
             <label className="form-check-label">Vegetarian</label>
           </div>
@@ -35,6 +68,8 @@ function PizzaForm() {
               type="radio"
               name="vegetarian"
               value="Not Vegetarian"
+              checked={!editVegetarian}
+              onChange={e => updateVegetarian(!e.target.checked)}
             />
             <label className="form-check-label">Not Vegetarian</label>
           </div>
